@@ -1,0 +1,108 @@
+<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg container-fluid">
+    <div class="row justify-content-center h-100">
+      <div class="col-sm-12 col-xl-8">
+        <div class="arrow-prev"></div>
+        <div class="arrow-next"></div>
+        <div class="modal-content">
+          <div class="modal-header">
+            <p>Details</p>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body col-md-12 col-xl-8 align-self-center">
+            <div class="offer_details">
+              <h5>{{ model.offer.category }}</h5>
+              <div class="mobile-model">
+                <div class="model-pop">
+                  <h4>{{ model.offer.source_name }}</h4>
+                  <h2>{{ model.offer.offer_short_description }}</h2>
+                  <h2>{{ model.offer.LearnMoreUrl }}</h2>
+                  <p class="offer-desc">{{ model.offer.offer_title }}</p>
+                </div>
+                <div class="modal-img">
+                  <img
+                    src="https://www.aarp.org"
+                    width="100%"
+                    alt="{{ model.offer.image_alt_text }}"
+                    id="modal-offer-img"
+                  />
+                  <script type="text/javascript">
+                    $("#modal-offer-img").attr(
+                      "src",
+                      "https://d1rw5d3ceg0ac8.cloudfront.net/?width=324&imageUrl=https://www.aarp.org" +
+                        '{{ model.offer.image_url.replace(" ", "") }}'
+                    );
+                  </script>
+                </div>
+              </div>
+            </div>
+
+            <div class="join-details">
+              <h2 class="deskText">
+                <span class="memType">Join</span>
+                <span style="display: none;">AARP</span
+                ><img src="/assets/images/red_logo.png" alt="AARP Logo" />
+                &amp; Save 25%
+              </h2>
+              <h2 class="mobText">
+                <span class="memType">Join</span>
+                <span style="display: none;">AARP</span
+                ><img src="/assets/images/red_logo.png" alt="AARP Logo" />
+                and Save 25%
+              </h2>
+              <p class="auto_renew">
+                <strong>Only <span>$12</span></strong> for your first year with
+                automatic renewal, normally $16
+              </p>
+
+              <div class="membertypejoin">
+                <a
+                  href="https://appsec.aarp.org/mem/join"
+                  data-formelementid="MEM-BEN-BTN-DBR-LPG-JNW-join-now-{{ model.offer.master_brand }}"
+                  class="joinNow"
+                  title="JOIN NOW"
+                  >JOIN NOW</a
+                >
+                <p class="risk_free">
+                  Already a member?
+                  <a
+                    href="https://appsec.aarp.org/mem/renew"
+                    class="renewtext renewHero"
+                    title="Renew Today"
+                    >Renew Today</a
+                  >
+                </p>
+              </div>
+
+              <div class="membertyperenew" style="display: none;">
+                <a
+                  href="https://appsec.aarp.org/mem/join"
+                  data-formelementid="MEM-BEN-BTN-DBR-LPG-JNW-join-now-{{ model.offer.master_brand }}"
+                  class="renewtext renewHero"
+                  title="RENEW NOW"
+                  >RENEW NOW</a
+                >
+                <p class="risk_free">
+                  Not a member?
+                  <a
+                    href="https://appsec.aarp.org/mem/renew"
+                    class="joinNow"
+                    title="Join Today"
+                    >Join Today</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

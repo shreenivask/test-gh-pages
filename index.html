@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>AARP - How to Join AARP</title>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="SHORTCUT ICON" href="/assets/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css"
+    />
+    <link href="/assets/css/custom_grid_aarp.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/dbr-mojo-join-test.css" />
+    <link
+      rel="stylesheet"
+      href="/assets/css/dbr_dynamic_card_img_section.css"
+    />
+    <style>
+    [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+      display: none !important;
+    }
+    </style>
+  </head>
+
+  <body ng-app="dbr-app">
+    <div class="wrapper" ng-controller="dbrCtrl" scroll>
+      <div id="container">
+        <div class="benefit_section">
+          <div id="categories" class="container-fluid container-xl">
+            <div class="row align-items-start">
+              <div
+                class="desktopView desktopCat col-sm-12 col-md-12 col-lg-3 col-xl-3"
+              >
+                <div class="category_list desktopCategory">
+                  <div class="clear_filter">
+                    <a class="view_all" ng-click="view($event)" ng-cloak
+                      >View All {{ totalOffers }} Benefits</a
+                    >
+                  </div>
+                  <h3 class="filter_title">Filter by Category</h3>
+                  <ul class="category">
+                    <li>
+                      <div class="clear_filter">
+                        <a class="see_all" ng-click="view($event)">See All</a>
+                      </div>
+                    </li>
+                    <li ng-repeat="category in categories" ng-cloak>
+                      <a
+                        class="category_title deskcategory {{ category.name }}"
+                        id="{{ category.title | strReplace }}"
+                        data-formelementid="MEM-BEN-BTN-DBR-LPG-CAT-{{ category.title | strReplace }}"
+                        data-categoryid="{{ category.name }}"
+                        ng-click="gtagDbrCategory(category.title); SelTopCategory(category.title, $event, this); ShowId($event);"
+                        >{{ category.title }}
+                        <span>({{ countsCat[category.title] }})</span></a
+                      >
+                      <ul
+                        class="dropdown {{ category.title | strReplace }}"
+                        ng-show="showContent"
+                      >
+                        <li
+                          class="dropdown_catg deskcategory"
+                          id="{{ categoryDrop.title | strReplace }}"
+                          ng-repeat="categoryDrop in category.second_level_tags"
+                          data-formelementid="MEM-BEN-BTN-DBR-LPG-CAT-{{ categoryDrop.title | strReplace }}"
+                          data-categoryid="{{ category.name }}"
+                          data-subcategoryid="{{ categoryDrop.deeplink_param_value }}"
+                          ng-click="gtagDbrCategory(categoryDrop.title); SelSubCategory(categoryDrop.title, category.title, $event); ShowId($event);"
+                          ng-model="categoryDrop.title"
+                          data-deeplink-param="{{ categoryDrop.deeplink_param_value }}"
+                        >
+                          {{ categoryDrop.title }}
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div
+                class="right_cont col-sm-12 col-md-12 col-lg-9 col-xl-9"
+                infinite-scroll="loadMore()"
+                infinite-scroll-distance="-0.5"
+              >
+                <div class="page_count">
+                  <p class="results">
+                    Showing
+                    <span class="count">{{ filteredOffers.length }}</span> Out
+                    of <strong>{{ offerCount }}</strong>
+                  </p>
+                </div>
+
+                <div class="display_cat" ng-cloak>
+                  <div class="row cartBox">
+                    <div
+                      class="col-sm-6 col-md-6 col-lg-4 col-xl-4 d-flex"
+                      ng-repeat="offers in sortedAllOffers | limitTo : limit | filter:offerFilter as filteredOffers"
+                    >
+                      <div class="card catg">
+                        <div
+                          class="cardClick"
+                          data-formelementid="MEM-BEN-BTN-DBR-LPG-CLK-{{ offers.category.replace('&','and') | trimSpace | lowercase }}-{{ offers.master_brand }}"
+                          data-categoryid="{{ offers.category_list }}"
+                          data-subcategoryid="{{ offers.subcategory_list }}"
+                          data-dbrofferid="{{ offers.dbr_offer_id }}"
+                          ng-click="openOfferModal(offers, $event)"
+                          id="{{ offers.dbr_offer_id }}"
+                        >
+                          <div
+                            class="card-img-top"
+                            ng-if="offers.provider_logo !== ''"
+                          >
+                            <img
+                              src="https://d1rw5d3ceg0ac8.cloudfront.net/?width=324&imageUrl=https://www.aarp.org{{ offers.provider_logo }}"
+                              width="100%"
+                              aria-label="offers"
+                              aria-hidden="true"
+                              id="a{{ offers.dbr_offer_id }}"
+                              alt="{{ offers.image_alt_text }}"
+                            />
+                          </div>
+                          <div
+                            class="card-img-top"
+                            ng-if="offers.provider_logo === ''"
+                          >
+                            <div
+                              class="prod_img"
+                              style="background-image: url('https://d1rw5d3ceg0ac8.cloudfront.net/?width=324&imageUrl=https://www.aarp.org{{ offers.image_url }}');"
+                            >
+                              <!--<img src="https://www.aarp.org" class="" alt="{{ offers.image_alt_text }}" >-->
+                            </div>
+                          </div>
+                          <div
+                            class="card-body"
+                            data-offer-type="{{ offers.dbr_offer_type }}"
+                          >
+                            <h5 class="card-title">
+                              {{ offers.offer_short_description }}
+                            </h5>
+                            <p class="card-text">{{ offers.source_name }}</p>
+                          </div>
+                          <div class="card-button card-btn">Learn More</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a id="toTop" style="display: inline;">Go To Top</a>
+      <edit-person-dialog model="editDialog"></edit-person-dialog>
+    </div>
+
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular-cookies.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+
+    <script src="/assets/js/ng-infinite-scroll.min.js"></script>
+    <script
+      type="text/javascript"
+      src="https://ddxp5xijf3rk2.cloudfront.net/js/slick.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery_lazyload/1.9.7/jquery.lazyload.min.js"
+    ></script>
+
+    <script
+      type="text/javascript"
+      src="https://ddxp5xijf3rk2.cloudfront.net/js/url_params_handler_v2_stage.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://ddxp5xijf3rk2.cloudfront.net/js/url_params_handler_v2.js"
+    ></script>
+
+    <script type="text/javascript">
+      var tempUrl = "dbr_modal.html";
+
+      // Merge two arrays with alternative values
+      function splicer(array, element, index) {
+        array.splice(index * 2, 0, element);
+        return array;
+      }
+      function orderAlternatively(array1, array2) {
+        return array1.reduce(splicer, array2.slice());
+      }
+
+      //Get he outer hight of the element
+      var win = $(window).width();
+      var categoryHeight = $(".category_list").height();
+      var sticky_header = $(".sticky_header").height();
+      var catlist = $("body").offset().top;
+      var scrollPosition = $(window).scrollTop();
+
+      var totalwidth, constVal, selectCat, seeAllwidth;
+      var checkWid;
+      $(document).ready(function () {
+        /* Lazy Load */
+        $("img.lazy").lazyload({
+          threshold: 400,
+        });
+
+        //Adding class based on the window resize
+        $(".category").scrollLeft(0);
+        var alterClass = function () {
+          var ww = document.body.clientWidth;
+          if (ww < 1025) {
+            $("body").removeClass("deskTop");
+            checkWid = ww;
+          } else if (ww >= 1025) {
+            checkWid = ww;
+            $("body").addClass("deskTop");
+            $(window).scroll(function () {
+              var scrollPosition = $(window).scrollTop();
+              if (scrollPosition >= 800) {
+                $("#toTop").fadeIn();
+              } else {
+                $("#toTop").fadeOut();
+              }
+            });
+          }
+        };
+        $(window).resize(function () {
+          alterClass();
+        });
+        //Fire it when the page first loads:
+        alterClass();
+
+        $(".see_all").addClass("active_all");
+
+        //Stciky scroller for mobile
+        $(window).scroll(function () {
+          var scrollPosition = $(window).scrollTop();
+
+          if (scrollPosition >= catlist) {
+            $(".category_list, .desktopView").addClass("catSticky");
+            $("#container").addClass("anchor");
+          } else {
+            $(".category_list, .desktopView").removeClass("catSticky");
+            $("#container").removeClass("anchor");
+          }
+        });
+
+        //close covid-19 banner
+        $(".close-icons").on("click", function (e) {
+          $(".covid19").hide();
+        });
+
+        //Scroll to top
+        $("#toTop").on("click", function (e) {
+          e.preventDefault();
+          $("html,body").animate(
+            {
+              scrollTop:
+                $("#categories").offset().top -
+                $(".sticky_header").outerHeight(true),
+            },
+            700
+          );
+        });
+      });
+      var win = $(window).width();
+
+      $("body").on("touchmove", ".category_list", function (e) {
+        e.stopPropagation();
+      });
+
+      //Angular Dependencies
+      var dbrMod = angular.module("dbr-app", ["infinite-scroll", "ngCookies"]);
+
+      //Enabling DBR Modal PopUp
+      var EditPersonDialogModel = function () {
+        this.visible = false;
+      };
+      EditPersonDialogModel.prototype.open = function (offer) {
+        this.offer = offer;
+        this.visible = true;
+      };
+
+      //DBR modal popup directive
+      dbrMod.directive("editPersonDialog", [
+        function () {
+          return {
+            restrict: "E",
+            scope: {
+              model: "=",
+            },
+            link: function (scope, element, attributes) {
+              scope.$watch("model.visible", function (newValue) {
+                var modalElement = element.find(".modal");
+
+                //Assign and updating URL links for modal popup
+                modalElement.modal(newValue ? "show" : "hide");
+              });
+
+              element.on("shown.bs.modal", function () {
+                scope.$apply(function () {
+                  scope.model.visible = true;
+                });
+              });
+
+              element.on("hidden.bs.modal", function () {
+                scope.$apply(function () {
+                  scope.model.visible = false;
+                });
+              });
+            },
+            templateUrl: tempUrl,
+          };
+        },
+      ]);
+
+      // String replcae filter for " & " -> "and"
+      dbrMod.filter("trimSpace", function () {
+        return function (value) {
+          return !value ? "" : value.replace(/ /g, "");
+        };
+      });
+
+      // String replcae filter for " & " -> "and", ", " -> "__", " " -> "_"
+      dbrMod.filter("strReplace", function () {
+        return function (catText) {
+          var catclass = catText.replace(/\&/g, "and");
+          var catclass = catclass.replace(/[^A-Z0-9]/gi, "_");
+          return catclass.toLowerCase();
+        };
+      });
+
+      // DBR controller
+      dbrMod.controller("dbrCtrl", [
+        "$cookies",
+        "$scope",
+        "$http",
+        "$filter",
+        function ($cookies, $scope, $http, $filter) {
+          $scope.oneAtATime = true;
+          $scope.editDialog = new EditPersonDialogModel();
+
+          $scope.random = function () {
+            return 0.5 - Math.random();
+          };
+          $http({
+            method: "GET",
+            url:
+              "https://ddxp5xijf3rk2.cloudfront.net/json/dbr/memberbenefits.json",
+          }).then(
+            function (response) {
+              $scope.categories = response.data.all_offers.top_level_tags;
+              $scope.catgIcon = response.data.ui_content.catIcon;
+
+              $scope.allCategories = []; //All vategory titles
+              $scope.allOffers = []; // Storing all the offers
+              $scope.socialOffers = []; //store offers related to Social
+              $scope.discountOffers = []; //store offers related to Discounted offer
+              ($scope.remainingOffers = []), ($scope.sortedAllOffers = []); // Storing offers after sorting
+              ($scope.countDt = 0), ($scope.countSc = 0); // initial count value
+              $scope.selCategoriesTop = []; // Store al the title of top category
+              $scope.limit = 15; // Set limit to display offer cards on page load
+
+              $scope.socialCount = 0;
+              $scope.discountCount = 0;
+
+              $scope.clickId = []; //To store the engagedOffers to pass through confirmation page
+              $scope.clickCatg = []; //To store the engagedCategory to pass through confirmation page
+              var offersCategoryCount = []; // To store the categries to display the counts of offers respects to that category
+
+              var countSlp,
+                countOffer = 0;
+              // Storing top and second level offers from json response to an array
+              angular.forEach($scope.categories, function (tlt, tltKey) {
+                $scope.allCategories.push(tlt.title);
+                if (tlt.offers && tlt.offers.length) {
+                  angular.forEach(tlt.offers, function (tltOffer, tlpOfferkey) {
+                    tltOffer.category = tlt.title;
+                    offersCategoryCount.push(tlt.title);
+                    $scope.allOffers.push(tltOffer);
+                  });
+                }
+                angular.forEach(tlt.second_level_tags, function (slt, sltKey) {
+                  $scope.selCategoriesTop.push(slt.title);
+                  angular.forEach(slt.offers, function (offer, offerKey) {
+                    offer.category = tlt.title;
+                    offer.category_sub = slt.title;
+                    offersCategoryCount.push(tlt.title);
+                    $scope.allOffers.push(offer);
+                  });
+                });
+              });
+
+              //To get the counts of the offers present for the top and sub categories
+              $scope.countsCat = [];
+              $.each(offersCategoryCount, function (key, value) {
+                var totalCategoryCount = $.grep(offersCategoryCount, function (
+                  elem
+                ) {
+                  return elem === value;
+                }).length;
+                $scope.countsCat[value] = ("0" + totalCategoryCount).slice(-2);
+              });
+
+              //Check for the mobile width to hide the top categories and change the names of the the categories
+              var win = $(window).width();
+              if (win <= 767) {
+                angular.element(document).ready(function () {
+                  $(
+                    "#community, #travel, #insurance, .health_and_wellness #medicare_eligible, #shopping_and_groceries, #community"
+                  ).hide();
+                  $(
+                    "#community, #travel, #insurance, .health_and_wellness #medicare_eligible, #shopping_and_groceries, #community"
+                  ).removeClass("deskcategory");
+                  $("#healthcare").text("Healthcare Insurance");
+                  $(".insurance #medicare_eligible").text(
+                    "Medicare Eligible Insurance"
+                  );
+                  $("#pet").text("Pet Insurance");
+                  $("#vehicle__life_and_property").text("Other Insurance");
+                  $("#home__real_estate_and_technology").text(
+                    "Home & Technology"
+                  );
+                });
+              }
+
+              // All offers shuffled
+              $scope.allOffers = shuffle($scope.allOffers);
+
+              //Global variable count
+              $scope.offerCount = $scope.allOffers.length;
+              $scope.totalOffers = $scope.allOffers.length;
+
+              // Sorting all offers as first 9 social, next 7 discount and then all remaining offers
+              angular.forEach($scope.allOffers, function (offer, offerKey) {
+                if (
+                  offer.dbr_offer_type == "discount" &&
+                  offer.category_list !== "travel" &&
+                  offer.category_list !== "entertainment"
+                ) {
+                  $scope.discountOffers.push(offer);
+                  $scope.countDt++;
+                } else if (
+                  offer.dbr_offer_type == "socialmission" &&
+                  offer.category_list !== "travel" &&
+                  offer.category_list !== "entertainment"
+                ) {
+                  $scope.socialOffers.push(offer);
+                  $scope.countSc++;
+                } else {
+                  $scope.remainingOffers.push(offer);
+                }
+              });
+
+              $scope.sortedAllOffers = orderAlternatively(
+                $scope.socialOffers,
+                $scope.discountOffers
+              );
+
+              //Shuffle orders of the offers
+              function shuffle(offerArr) {
+                var a = offerArr.length,
+                  t,
+                  i;
+                while (a) {
+                  i = Math.floor(Math.random() * a--);
+                  t = offerArr[a];
+                  offerArr[a] = offerArr[i];
+                  offerArr[i] = t;
+                }
+                return offerArr;
+              }
+
+              //On click category scroll page to top
+              $scope.funcScroll = function () {
+                var top_div = $("#categories").offset().top - 2;
+                var topScroll = top_div - $("body").outerHeight(true);
+                $("html,body").animate({
+                  scrollTop: topScroll,
+                });
+              };
+
+              // On clikc category pills filter the offers and start from the beginning of the offers
+              $scope.funcScrollCat = function () {
+                $(".right_cont .display_cat").fadeOut(100).delay(100);
+                var top_div = $("#categories").offset().top + 1;
+                var topScroll = top_div - $(".desktopView").outerHeight(true);
+                $("html,body").animate(
+                  {
+                    scrollTop: topScroll,
+                  },
+                  100
+                );
+                $(".right_cont .display_cat").fadeIn(100);
+              };
+
+              $scope.selCategory = "";
+              $scope.showContent = false;
+              var lastActiveTab = false;
+
+              // Rest Category
+              $(".clear_filter").hide();
+              $scope.view = function (e) {
+                $(".category_title").removeClass("active_cat");
+                $(".dropdown_catg").removeClass("active_sub");
+                $(event.target).addClass("active_all");
+                $scope.sortedAllOffers = orderAlternatively(
+                  $scope.socialOffers,
+                  $scope.discountOffers
+                );
+                $scope.selCategory = "";
+                lastActiveTab.showContent = false;
+                $scope.limit = 15;
+                $scope.offerCount = $scope.allOffers.length;
+                $(".clear_filter").hide();
+                $(".filter_title").show();
+                if (checkWid < 1025 || win < 1025) {
+                  $scope.funcScrollCat();
+                }
+              };
+
+              //Lazy Loading content on scroll
+              $scope.loadMore = function () {
+                $scope.limit += 15;
+              };
+
+              //Scroll to the first fill of category in mobile mode
+              $(".see_all").click(function () {
+                $(".category").scrollLeft(0);
+                return false;
+              });
+
+              //Get the clicked id of category for scrolling the category pills in mobile
+              $scope.ShowId = function (event) {
+                selectCat = event.target.id;
+                seeAllwidth = 95;
+                (constVal = 52), (totalwidth = 0);
+
+                $(".desktopCategory .deskcategory").each(function () {
+                  if ($(this).attr("id") == selectCat) {
+                    totalwidth = (seeAllwidth + totalwidth).toFixed(0);
+                    $(".desktopCategory .category").animate(
+                      {
+                        scrollLeft: totalwidth,
+                      },
+                      500
+                    );
+                    return false;
+                  }
+                  totalwidth = totalwidth + $(this).width() + constVal;
+                });
+              };
+
+              //Set cookie engagedSubCategory based on the user click or interaction
+              $cookies.put("engagedSubCategory", " ", {
+                samesite: "strict",
+                secure: true,
+                path: "/",
+              });
+
+              var win = $(window).width();
+              //filtering function for the offer based on the Topcategory selections
+              $scope.SelTopCategory = function (categoryTop, event, itemScope) {
+                $scope.clickeve = event.originalEvent;
+                var categoryTops = $filter("strReplace")(
+                  categoryTop
+                ).toLowerCase();
+
+                //Hide the show the subcategory butons
+                itemScope.showContent = !itemScope.showContent;
+                if (lastActiveTab) {
+                  if (lastActiveTab !== itemScope) {
+                    lastActiveTab.showContent = false;
+                  }
+                }
+                if (itemScope.showContent) {
+                  lastActiveTab = itemScope;
+                }
+
+                $(".clear_filter").show();
+                $(".filter_title").hide();
+                $scope.limit = 500;
+                searchCategory = categoryTop;
+                $(".see_all").removeClass("active_all");
+                $(".category_title, .category_title span").removeClass(
+                  "active_cat"
+                );
+                $(".dropdown_catg").removeClass("active_sub");
+                $(event.target).addClass("active_cat");
+                $(".dropdown").removeClass("active_cat");
+
+                //check windows width to apply the scroll function
+                if (checkWid > 1025 || win > 1025) {
+                  if (angular.isDefined($scope.clickeve)) {
+                    $scope.funcScroll();
+                  }
+                }
+                if (checkWid < 1025 || win < 1025) {
+                  if (angular.isDefined($scope.clickeve)) {
+                    $scope.funcScrollCat();
+                  }
+                }
+                if (win <= 767) {
+                  $(".see_all").removeClass("active_all");
+                  $("." + categoryTops).addClass("active_cat");
+                  $(".dropdown").removeClass("active_cat");
+                }
+
+                $scope.selCategory = categoryTop;
+
+                $scope.socialCount = 0;
+                $scope.discountCount = 0;
+                $scope.socialOffersFiltered = [];
+                $scope.discountOffersFiltered = [];
+                $scope.sortedAllOffers = $scope.socialOffers
+                  .concat($scope.discountOffers)
+                  .concat($scope.remainingOffers);
+              };
+
+              var win = $(window).width();
+
+              //filtering function for the offer based on the subcategory selections
+              $scope.SelSubCategory = function (
+                categoryDrop,
+                topCategory,
+                event
+              ) {
+                $scope.clickeve = event.originalEvent;
+                var categorySub = $filter("strReplace")(
+                  categoryDrop
+                ).toLowerCase();
+
+                $scope.selCategory = topCategory + "-" + categoryDrop;
+
+                $scope.selCategory = categoryDrop;
+                $scope.limit = 500;
+                searchCategory = categoryDrop;
+                if (win < 1025) {
+                  $(".dropdown").removeClass("active_cat");
+                  $(".category_title, .category_title span").removeClass(
+                    "active_cat"
+                  );
+                  $(".see_all").removeClass("active_all");
+                  $(".dropdown_catg").removeClass("active_sub");
+                }
+                $(".dropdown").removeClass("active_cat");
+                $(event.target).addClass("active_sub");
+                $(event.target).siblings().removeClass("active_sub");
+
+                if (checkWid > 1025 || win > 1025) {
+                  if (angular.isDefined($scope.clickeve)) {
+                    $scope.funcScroll();
+                  }
+                }
+                if (checkWid < 1025 || win < 1025) {
+                  if (angular.isDefined($scope.clickeve)) {
+                    $scope.funcScrollCat();
+                  }
+                }
+
+                $scope.selCategory = topCategory + "-" + categoryDrop;
+
+                $scope.socialCount = 0;
+                $scope.discountCount = 0;
+                $scope.socialOffersFiltered = [];
+                $scope.discountOffersFiltered = [];
+                $scope.sortedAllOffers = $scope.socialOffers
+                  .concat($scope.discountOffers)
+                  .concat($scope.remainingOffers);
+              };
+
+              //Function the open modal popup and display offers details of the clicked category offer
+              $scope.openOfferModal = function (offer, event) {
+                $scope.catgId = event.currentTarget.id;
+                $scope.newEle = {};
+                $scope.present = false;
+
+                // gtagDbrOffer(offer.source_name);
+                $(".offer-desc").text("...");
+
+                //Ajax post to get the offer page data for modal popup
+                $.ajax({
+                  type: "POST",
+                  url: "https://scripts.targetclose.com/tc/get-json-data",
+                  data: {
+                    ourl: "https://aarp.org" + offer.offer_page_data,
+                  },
+                  timeout: 5000,
+                  async: true,
+                }).done(function (data) {
+                  console.log(data);
+                  if (typeof data != "undefiend") {
+                    offerData = JSON.parse(data);
+                    if (offerData.success == true && offerData.message) {
+                      if (offerData.message.offer_description) {
+                        offer.offer_description =
+                          offerData.message.offer_description;
+                      } else {
+                        offer.offer_description = "";
+                      }
+                      $(".offer-desc").text($(offer.offer_description).text());
+                    }
+                  }
+                });
+
+                $scope.editDialog.open(offer);
+              };
+
+              //Filtering offers based on the user click selected category
+              $scope.offerFilter = function (offers) {
+                if ($scope.selCategory) {
+                  if ($scope.selCategory.indexOf("-") >= 0) {
+                    var topCat = $scope.selCategory.substr(
+                      0,
+                      $scope.selCategory.indexOf("-")
+                    );
+                    if (
+                      offers.category == $scope.selCategory.split("-")[0] &&
+                      offers.category_sub == $scope.selCategory.split("-")[1]
+                    ) {
+                      angular.forEach(offers, function (value, key) {
+                        if (
+                          key == "dbr_offer_type" &&
+                          value == "socialmission"
+                        ) {
+                          $scope.socialOffersFiltered.push(offers);
+                        } else if (
+                          key == "dbr_offer_type" &&
+                          value == "discount"
+                        ) {
+                          $scope.discountOffersFiltered.push(offers);
+                        }
+                      });
+                      $scope.socialOffersFiltered = $scope.socialOffersFiltered.filter(
+                        function (item, i, ar) {
+                          return ar.indexOf(item) === i;
+                        }
+                      );
+                      $scope.discountOffersFiltered = $scope.discountOffersFiltered.filter(
+                        function (item, i, ar) {
+                          return ar.indexOf(item) === i;
+                        }
+                      );
+                      if ($scope.socialOffersFiltered.length == 1) {
+                        $scope.sortedAllOffers = orderAlternatively(
+                          $scope.discountOffersFiltered,
+                          $scope.socialOffersFiltered
+                        );
+                      } else {
+                        $scope.sortedAllOffers = orderAlternatively(
+                          $scope.socialOffersFiltered,
+                          $scope.discountOffersFiltered
+                        );
+                      }
+
+                      //Update Total count with respect to Top Second-level filtering
+                      $scope.offerCount = $scope.sortedAllOffers.length;
+                      return $scope.sortedAllOffers;
+                    }
+                  } else {
+                    if (offers.category == $scope.selCategory) {
+                      angular.forEach(offers, function (value, key) {
+                        if (
+                          key == "dbr_offer_type" &&
+                          value == "socialmission"
+                        ) {
+                          $scope.socialOffersFiltered.push(offers);
+                        } else if (
+                          key == "dbr_offer_type" &&
+                          value == "discount"
+                        ) {
+                          $scope.discountOffersFiltered.push(offers);
+                        }
+                      });
+                      $scope.socialOffersFiltered = $scope.socialOffersFiltered.filter(
+                        function (item, i, ar) {
+                          return ar.indexOf(item) === i;
+                        }
+                      );
+                      $scope.discountOffersFiltered = $scope.discountOffersFiltered.filter(
+                        function (item, i, ar) {
+                          return ar.indexOf(item) === i;
+                        }
+                      );
+                      if ($scope.socialOffersFiltered.length == 1) {
+                        $scope.sortedAllOffers = orderAlternatively(
+                          $scope.discountOffersFiltered,
+                          $scope.socialOffersFiltered
+                        );
+                      } else {
+                        $scope.sortedAllOffers = orderAlternatively(
+                          $scope.socialOffersFiltered,
+                          $scope.discountOffersFiltered
+                        );
+                      }
+
+                      //Update Total count with respect to Top level filtering
+                      $scope.offerCount = $scope.sortedAllOffers.length;
+                      return $scope.sortedAllOffers;
+                    }
+                  }
+                } else {
+                  return offers;
+                }
+              };
+            },
+            function errorCallback(response) {
+              console.log("Failed to load Json");
+            }
+          );
+        },
+      ]);
+    </script>
+  </body>
+</html>
